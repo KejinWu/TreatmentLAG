@@ -51,7 +51,7 @@ TreatmentLAG = function(...,exovariablesinuvector = FALSE,model = "LMM",varnames
     #DTVEM_out$OpenMxstage2out$OpenMxout = DTVEM_out$OpenMxstage2out$OpenMxout[-which(DTVEM_out$OpenMxstage2out$OpenMxout$sig==FALSE),]
     cat(paste("Fix",outcome[nnn],"to be the only one outcome variable and perform additional stage",".\n",sep=" "))
     # Add MI lmer estimation
-    numberofalldata = nrow(all_data)
+    numberofalldata = nrow(data)
     All_sig_lags = DTVEM_out$OpenMxstage2out$OpenMxout$name
     splitmat1 = strsplit(All_sig_lags,"lagon")
     splitmat1 = matrix(unlist(splitmat1),byrow = T,ncol =2,nrow = length(All_sig_lags))
@@ -71,9 +71,9 @@ TreatmentLAG = function(...,exovariablesinuvector = FALSE,model = "LMM",varnames
       if(splitdataframe[i,1]%in%varnames_exo_eachtime){
         lag_value = as.numeric(splitdataframe[i,3])
         add_data = c()
-        col_order = which(splitdataframe[i,1]==colnames(all_data))
+        col_order = which(splitdataframe[i,1]==colnames(data))
         for (n in 1:N) {
-          suballdata = all_data[((n-1)*Timepoints+1):(n*Timepoints),]
+          suballdata = data[((n-1)*Timepoints+1):(n*Timepoints),]
           numberofsubdata = nrow(suballdata)
           add_data = c(add_data,suballdata[,col_order][(max_lag+1-lag_value):(numberofsubdata-lag_value)])
         }
@@ -83,9 +83,9 @@ TreatmentLAG = function(...,exovariablesinuvector = FALSE,model = "LMM",varnames
       }else{
         lag_value = as.numeric(splitdataframe[i,3])
         add_data = c()
-        col_order = which(splitdataframe[i,1]==colnames(all_data))
+        col_order = which(splitdataframe[i,1]==colnames(data))
         for (n in 1:N) {
-          suballdata = all_data[((n-1)*Timepoints+1):(n*Timepoints),]
+          suballdata = data[((n-1)*Timepoints+1):(n*Timepoints),]
           numberofsubdata = nrow(suballdata)
           add_data = c(add_data,suballdata[,col_order][(max_lag+1-lag_value):(numberofsubdata-lag_value)])
         }
@@ -104,11 +104,11 @@ TreatmentLAG = function(...,exovariablesinuvector = FALSE,model = "LMM",varnames
     level2_formula = paste("(",1,"+",level2_formula,"||","ID_lagged",")")
     formula_fit_lemr = paste(formula_fit_lemr,"+",level2_formula)
     formula_fit_lemr = parse(text = paste("lmer","(",formula_fit_lemr,")"))
-    outcome_col_order = which(outcome[nnn]==colnames(all_data))
+    outcome_col_order = which(outcome[nnn]==colnames(data))
     all_outcome_lag = c()
     ID_lagged = c()
     for (n in 1:N) {
-      suballdata = all_data[((n-1)*Timepoints+1):(n*Timepoints),]
+      suballdata = data[((n-1)*Timepoints+1):(n*Timepoints),]
       numberofsubdata = nrow(suballdata)
       all_outcome_lag = c(all_outcome_lag,suballdata[,outcome_col_order][(max_lag+1):numberofsubdata])
       ID_lagged = c(ID_lagged,suballdata[,length(colnames(suballdata))][(max_lag+1):numberofsubdata])
